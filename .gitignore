@@ -40,18 +40,5 @@ Thumbs.db
 # Ignore log files
 **/.log
 
-
-# Ignore glow_effect.vcxproj file
-glow_effect/glow_effect.vcxproj
-
-# Ignore Visual Studio Solution Related Files
-# Ignore Visual Studio 2019 solution and project files
-*.sln
-*.vcxproj
-*.vcxproj.filters
-*.vcxproj.user
-*.aps
-*.rc
-
 # Ignore Useless Files
 ._*

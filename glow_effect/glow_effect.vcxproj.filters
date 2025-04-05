@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{2082e238-8882-4d50-a18c-349e081d61fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include Files">
+      <UniqueIdentifier>{7351f8de-774d-48c7-bf87-59c78f87a4b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\cref code">
+      <UniqueIdentifier>{f8c81760-5561-44bf-a547-2043c3df723b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\cuda code">
+      <UniqueIdentifier>{e808371f-884d-49c6-9a74-6a25af79aca0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{69c4013f-9c88-4f08-aadb-fc1fc78a45ed}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="include\dilate_erode.hpp">
+      <Filter>Include Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\glow_effect.cpp">
+      <Filter>Source Files\cref code</Filter>
+    </ClCompile>
+    <ClCompile Include="all_main.cpp" />
+    <ClCompile Include="source\control_gui.cpp">
+      <Filter>Source Files\cref code</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ImageProcessingUtil.cpp">
+      <Filter>Source Files\cref code</Filter>
+    </ClCompile>
+    <ClCompile Include="source\TRTInference.cpp">
+      <Filter>Source Files\cref code</Filter>
+    </ClCompile>
+    <ClCompile Include="source\wx_gui.cpp">
+      <Filter>Source Files\cref code</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\gaussian_blur.hpp">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\old_movies.cuh">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="source\glow_effect.hpp">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\wx_gui.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\all_main.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ImageProcessingUtil.hpp">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\TRTInference.hpp">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\mipmap.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\segmentation_kernels.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="source_cu\mipmap_short.cu">
+      <Filter>Source Files\cuda code</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="glow_effect.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="source_cu\mipmap.cu">
+      <Filter>Source Files\cuda code</Filter>
+    </CudaCompile>
+    <CudaCompile Include="source_cu\segmentation_kernels.cu">
+      <Filter>Source Files\cuda code</Filter>
+    </CudaCompile>
+  </ItemGroup>
+</Project>

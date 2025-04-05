@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="all_main.cpp" />
+    <ClCompile Include="source\glow_effect.cpp" />
+    <ClCompile Include="source\control_gui.cpp" />
+    <ClCompile Include="source\ImageProcessingUtil.cpp" />
+    <ClCompile Include="source\TRTInference.cpp" />
+    <ClCompile Include="source\wx_gui.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="include\dilate_erode.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\gaussian_blur.hpp" />
+    <ClInclude Include="include\old_movies.cuh" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="source\all_main.h" />
+    <ClInclude Include="source\glow_effect.hpp" />
+    <ClInclude Include="source\ImageProcessingUtil.hpp" />
+    <ClInclude Include="source\mipmap.h" />
+    <ClInclude Include="source\segmentation_kernels.h" />
+    <ClInclude Include="source\TRTInference.hpp" />
+    <ClInclude Include="source\wx_gui.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="source_cu\mipmap.cu">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">--compiler-options "/EHsc /W3 /nologo /O2 /Fdx64\Release\vc142.pdb /MD" -g -G %(AdditionalOptions)</AdditionalOptions>
+      <Include Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Include)</Include>
+    </CudaCompile>
+    <CudaCompile Include="source_cu\segmentation_kernels.cu" />
+    <None Include="source_cu\mipmap_short.cu">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="glow_effect.rc" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2AFCFACD-DCCC-46DA-8E02-2019CA615018}</ProjectGuid>
+    <RootNamespace>glow_effect</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.8.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>
+    </IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>D:\csi4900\GlowEffect\glow_effect;D:\csi4900\GlowEffect\glow_effect\include;D:\csi4900\GlowEffect\movie_effect\common\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\include;$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\lib\x64;C:\Program Files\NVIDIA\TensorRT-8.5.3.1\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalUsingDirectories>
+      </AdditionalUsingDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <CodeGeneration>compute_75,sm_75</CodeGeneration>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+      <AdditionalOptions>--threads 0 %(AdditionalOptions)</AdditionalOptions>
+      <Include>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\include;C:\Users\Hawk\Desktop\cuda-samples-11.8\Common;%(Include)</Include>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files\NVIDIA\TensorRT-8.5.3.1\include;C:\Program Files\NVIDIA\CUDNN\v8.9.7\include;C:\Program Files\NVIDIA Corporation\NvToolsExt\include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\include;C:\DevelopmentTools\OpenCV\install\include;C:\DevelopmentTools\LibTorchCuda118\libtorch\include;C:\DevelopmentTools\LibTorchCuda118\libtorch\include\torch\csrc\api\include;D:\csi4900\GlowEffect\glow_effect\source;D:\csi4900\GlowEffect;D:\csi4900\wxWidgetLib\lib\vc_x64_lib;D:\csi4900\wxWidgetLib\include\msvc;D:\csi4900\wxWidgetLib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>kernel32.lib;
+user32.lib;
+gdi32.lib;
+winspool.lib;
+comdlg32.lib;
+advapi32.lib;
+shell32.lib;
+ole32.lib;
+oleaut32.lib;
+uuid.lib;
+odbc32.lib;
+odbccp32.lib;
+torch.lib;
+torch_cpu.lib;
+torch_cuda.lib;
+cuda.lib
+;cudart.lib;
+cublas.lib;
+cufft.lib;
+cudnn.lib
+;nvrtc.lib;
+c10.lib;
+opencv_img_hash470.lib;
+opencv_world470.lib;
+nvinfer.lib;
+nvonnxparser.lib;
+nvparsers.lib;
+nvinfer_plugin.lib;
+nvToolsExt64_1.lib;wxbase32u.lib;wxmsw32u_core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\csi4900\wxWidgetLib\lib\vc_x64_lib;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\lib\x64;C:\Program Files\NVIDIA\TensorRT-8.5.3.1\lib;C:\Program Files %28x86%29\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\lib\x64;C:\Program Files %28x86%29\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\atlmfc\lib\x64;C:\Program Files %28x86%29\Microsoft Visual Studio\2019\Community\VC\Auxiliary\VS\lib\x64;C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.22000.0\ucrt\x64;C:\Program Files %28x86%29\Microsoft Visual Studio\2019\Community\VC\Auxiliary\VS\UnitTest\lib\x64;C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.22000.0\um\x64;C:\Program Files %28x86%29\Windows Kits\NETFXSDK\4.8\Lib\um\x64;C:\DevelopmentTools\LibTorchCuda118\libtorch\lib;C:\Program Files\NVIDIA\CUDNN\v8.9.7\lib\x64;C:\DevelopmentTools\OpenCV\install\x64\vc16\lib;C:\Program Files\NVIDIA Corporation\NvToolsExt\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <CodeGeneration>compute_75,sm_75</CodeGeneration>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+      <AdditionalOptions>--threads 0 -g -G %(AdditionalOptions)</AdditionalOptions>
+      <CudaRuntime>Shared</CudaRuntime>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.8.targets" />
+  </ImportGroup>
+</Project>
