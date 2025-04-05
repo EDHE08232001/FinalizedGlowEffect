@@ -124,6 +124,30 @@ public:
 	 * @return Vector of segmentation mask images
 	 */
 	static std::vector<cv::Mat> measure_segmentation_trt_performance_single_batch_parallel(const std::string& trt_plan, const std::vector<torch::Tensor>& img_tensors, int num_streams);
+
+	/**
+	 * @brief Processes multiple images in parallel using a pre-loaded single-batch TRT engine
+	 *
+	 * This optimized version eliminates the engine deserialization overhead by accepting a
+	 * previously loaded TensorRT engine. This is especially useful for video processing
+	 * where multiple batches of frames need to be processed with the same model.
+	 *
+	 * Key optimizations:
+	 * 1. Accepts a pre-loaded ICudaEngine pointer instead of loading from a plan file
+	 * 2. Creates multiple execution contexts from the shared engine (one per worker thread)
+	 * 3. Uses CUDA Graphs for post-processing operations to reduce kernel launch overhead
+	 * 4. Properly separates inference streams from post-processing streams
+	 * 5. Implements robust error handling and recovery mechanisms
+	 *
+	 * @param engine Pre-loaded TensorRT engine pointer (must remain valid during the function call)
+	 * @param img_tensors Vector of individual image tensors (each with batch_size=1)
+	 * @param num_streams Number of parallel streams to use
+	 * @return Vector of segmentation mask images
+	 */
+	static std::vector<cv::Mat> measure_segmentation_trt_performance_single_batch_parallel_preloaded(
+		nvinfer1::ICudaEngine* engine,
+		const std::vector<torch::Tensor>& img_tensors,
+		int num_streams);
 };
 
 #endif // TRT_INFERENCE_HPP
