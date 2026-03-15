@@ -12,12 +12,9 @@
  * VERSION     : Updated 2025 FEB 04 (with additional error-checking and exception handling)
  *******************************************************************************************************************/
 
-#include "dilate_erode.hpp"
-#include "gaussian_blur.hpp"
 #include "opencv2/opencv.hpp"
 #include <cuda_runtime.h>
 #include "glow_effect.hpp"
-#include "old_movies.cuh"
 #include "all_common.h"
 #include <torch/torch.h>
 #include <vector>
@@ -137,8 +134,69 @@ std::vector<cv::Mat> triple_buffered_mipmap_pipeline(const std::vector<cv::Mat>&
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Function: glow_blow
+// Helper Function: ping_pong_mipmap_pipeline
+// Uses 2 buffers (Ping-Pong pattern) for alternating read/write GPU operations.
+// Simpler than triple buffering with lower memory overhead.
 ////////////////////////////////////////////////////////////////////////////////
+std::vector<cv::Mat> ping_pong_mipmap_pipeline(const std::vector<cv::Mat>& resized_masks,
+	int frame_width, int frame_height,
+	float default_scale, int param_KeyLevel) {
+	int N = resized_masks.size();
+	const int numBuffers = 2; // Ping-Pong: only 2 buffers
+	std::vector<cv::Mat> outputImages(N);
+
+	uchar4* ppSrc[2] = { nullptr, nullptr };
+	uchar4* ppDst[2] = { nullptr, nullptr };
+	cudaStream_t ppStreams[2];
+	cudaEvent_t ppDone[2];
+
+	for (int i = 0; i < numBuffers; ++i) {
+		checkCudaErrors(cudaStreamCreateWithFlags(&ppStreams[i], cudaStreamNonBlocking));
+		checkCudaErrors(cudaEventCreate(&ppDone[i]));
+		checkCudaErrors(cudaMallocHost((void**)&ppSrc[i], frame_width * frame_height * sizeof(uchar4)));
+		checkCudaErrors(cudaMallocHost((void**)&ppDst[i], frame_width * frame_height * sizeof(uchar4)));
+	}
+
+	for (int i = 0; i < N; ++i) {
+		int cur = i % numBuffers;   // Current "ping" or "pong" buffer
+		int prev = (i - 1) % numBuffers;
+
+		// Wait for the previous operation on this buffer to finish before reusing it
+		if (i >= numBuffers) {
+			checkCudaErrors(cudaEventSynchronize(ppDone[cur]));
+			// Collect the result from 2 iterations ago
+			cv::Mat mipmapResult(frame_height, frame_width, CV_8UC4);
+			memcpy(mipmapResult.data, ppDst[cur], frame_width * frame_height * sizeof(uchar4));
+			outputImages[i - numBuffers] = mipmapResult;
+		}
+
+		// Fill the current buffer and launch async mipmap
+		convert_mask_to_rgba_buffer(resized_masks[i], ppSrc[cur], frame_width, frame_height, param_KeyLevel);
+		apply_mipmap_async(resized_masks[i], ppDst[cur], default_scale, param_KeyLevel, ppStreams[cur]);
+		checkCudaErrors(cudaEventRecord(ppDone[cur], ppStreams[cur]));
+	}
+
+	// Drain remaining results
+	for (int i = 0; i < std::min(N, numBuffers); ++i) {
+		int idx = (N - numBuffers + i);
+		if (idx < 0) idx = i;
+		int buf = idx % numBuffers;
+		checkCudaErrors(cudaEventSynchronize(ppDone[buf]));
+		cv::Mat mipmapResult(frame_height, frame_width, CV_8UC4);
+		memcpy(mipmapResult.data, ppDst[buf], frame_width * frame_height * sizeof(uchar4));
+		outputImages[idx] = mipmapResult;
+	}
+
+	for (int i = 0; i < numBuffers; ++i) {
+		checkCudaErrors(cudaFreeHost(ppSrc[i]));
+		checkCudaErrors(cudaFreeHost(ppDst[i]));
+		checkCudaErrors(cudaStreamDestroy(ppStreams[i]));
+		checkCudaErrors(cudaEventDestroy(ppDone[i]));
+	}
+
+	return outputImages;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Function: glow_blow
 ////////////////////////////////////////////////////////////////////////////////
@@ -1152,18 +1210,7 @@ void glow_effect_video_single_batch_parallel(const char* video_nm, std::string p
 
 	std::cout << "TARGET VALUE: " << param_KeyLevel << " (using delta: " << EXACT_DETECTION_DELTA << ")" << std::endl;
 
-	// Pre-allocate memory for triple buffering - OPTIMIZED MEMORY USAGE
-	cudaStream_t mipmapStreams[3];
-	cudaEvent_t mipmapDone[3];
-	uchar4* tripleSrc[3] = { nullptr, nullptr, nullptr };
-	uchar4* tripleDst[3] = { nullptr, nullptr, nullptr };
-
-	for (int i = 0; i < 3; ++i) {
-		checkCudaErrors(cudaStreamCreateWithFlags(&mipmapStreams[i], cudaStreamNonBlocking));
-		checkCudaErrors(cudaEventCreate(&mipmapDone[i]));
-		checkCudaErrors(cudaMallocHost((void**)&tripleSrc[i], frame_width * frame_height * sizeof(uchar4)));
-		checkCudaErrors(cudaMallocHost((void**)&tripleDst[i], frame_width * frame_height * sizeof(uchar4)));
-	}
+	// Ping-Pong buffers are used via ping_pong_mipmap_pipeline() during post-processing
 
 	while (processing) {
 		batch_count++;
@@ -1311,12 +1358,12 @@ void glow_effect_video_single_batch_parallel(const char* video_nm, std::string p
 			}
 		}
 
-		// Apply triple buffered mipmap processing to all masks at once - MAINTAIN THIS OPTIMIZATION
+		// Apply ping-pong buffered mipmap processing - lower memory overhead than triple buffering
 		auto mipmap_start = std::chrono::high_resolution_clock::now();
 		std::vector<cv::Mat> mipmap_results;
 
 		if (!resized_masks_batch.empty()) {
-			mipmap_results = triple_buffered_mipmap_pipeline(
+			mipmap_results = ping_pong_mipmap_pipeline(
 				resized_masks_batch, frame_width, frame_height,
 				static_cast<float>(default_scale), param_KeyLevel
 			);
@@ -1373,15 +1420,7 @@ void glow_effect_video_single_batch_parallel(const char* video_nm, std::string p
 		}
 	}
 
-	// Clean up triple buffering resources
-	for (int i = 0; i < 3; ++i) {
-		checkCudaErrors(cudaFreeHost(tripleSrc[i]));
-		checkCudaErrors(cudaFreeHost(tripleDst[i]));
-		checkCudaErrors(cudaStreamDestroy(mipmapStreams[i]));
-		checkCudaErrors(cudaEventDestroy(mipmapDone[i]));
-	}
-
-	// *** OPTIMIZATION: Clean up the engine and runtime at the end ***
+	// Clean up the engine and runtime
 	if (engine) {
 		engine->destroy();
 	}

@@ -60,7 +60,6 @@ typedef unsigned short  ushort;
 typedef unsigned int    uint;
 
 // Global Variables
-extern int mipmap_level;
 extern int param_KeyLevel;
 extern int param_KeyScale;
 extern int default_scale;

@@ -14,7 +14,6 @@ extern int button_id;
 extern int param_KeyScale;
 extern int param_KeyLevel;
 extern int default_scale;
-extern cv::Vec3b param_KeyColor;
 
 /**
  * @brief Applies a CUDA-based mipmapping filter to an RGBA image.
