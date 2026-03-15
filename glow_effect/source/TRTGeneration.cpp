@@ -1,5 +1,4 @@
 #include "TRTGeneration.hpp"
-#pragma once
 
 
 std::vector<int> TRTGeneration::gen_trt_plan(const std::string& onnxModelPath, const std::string& planFilePath,
@@ -59,7 +58,6 @@ std::vector<int> TRTGeneration::gen_trt_plan(const std::string& onnxModelPath, c
         batchSize = inputDims.d[0];
         channelNum = inputDims.d[1];
     }
-    cout << "BATCHSIZEBATCHSIZEBATCHSIZEBATCHSIZEBATCHSIZEBATCHSIZEBATCHSIZE: " << endl;
     cout << "Selected INT8 Calibrator BatchSize: " << batchSize << endl;
 
     Int8EntropyCalibrator* calibrator = new Int8EntropyCalibrator(batchSize, channelNum, imagePaths, "./calibration_cache_file", inputTensorNames);
