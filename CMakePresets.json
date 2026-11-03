@@ -1,0 +1,39 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "release",
+      "displayName": "Release (default generator)",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug (default generator)",
+      "binaryDir": "${sourceDir}/build-debug",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "ninja",
+      "displayName": "Release with Ninja",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "vs2022",
+      "displayName": "Visual Studio 2022 solution (x64)",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+    }
+  ],
+  "buildPresets": [
+    { "name": "release", "configurePreset": "release", "configuration": "Release" },
+    { "name": "debug", "configurePreset": "debug", "configuration": "Debug" },
+    { "name": "ninja", "configurePreset": "ninja" },
+    { "name": "vs2022", "configurePreset": "vs2022", "configuration": "Release" }
+  ]
+}

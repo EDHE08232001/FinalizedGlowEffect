@@ -1,44 +1,49 @@
-# Ignore all image/media files
+# Build trees
+/build*/
+**/out/
+**/x64/
+compile_commands.json
+
+# IDEs / OS
+**/.vs/
+**/.vscode/
+**/.idea/
+.DS_Store
+Thumbs.db
+._*
+
+# Models and engines (large, GPU-specific) - see models/README.md
+models/*
+!models/README.md
+*.onnx
+*.plan
+*.engine
+*.trt
+**/onnx-models.zip
+**/TRT-Plans/
+
+# Program output
+/output/
+*.log
+
+# Media files
 *.png
 *.jpg
 *.jpeg
 *.gif
 *.bmp
 *.tiff
-*.ico
-*.svg
 *.webp
 *.mp4
-*.mp3
-*.wav
-*.ogg
-*.flac
 *.avi
 *.mov
 *.mkv
 *.webm
+*.mp3
+*.wav
 
-# Ignore Visual Studio folders
-**/.vs/
-
-# Ignore VS Code folders
-**/.vscode/
-
-# Ignore all build folders
-**/build/
-**/out/
-**/x64/
-
-# Ignore common IDE or OS-specific files
-.DS_Store
-Thumbs.db
-
-# Ignore ONNX Models and TRT Plans
-**/onnx-models.zip
-**/TRT-Plans/
-
-# Ignore log files
-**/.log
-
-# Ignore Useless Files
-._*
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
